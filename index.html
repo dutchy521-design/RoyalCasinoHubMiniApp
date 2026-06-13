@@ -1255,8 +1255,6 @@ Lädt...
 </div>
 
 <script>
-
-let cachedUsers = [];
 let spinLocked = false;
 function show(p){
 document.querySelectorAll('.page').forEach(e=>e.classList.remove('active'));
@@ -1324,7 +1322,7 @@ try{
 const { data, error } = await client
 .from("users")
 .select("*")
-.eq("user_id", String(telegramUser));
+.eq("id", String(telegramUser));
 
 if(error){
 document.getElementById("xp").innerText =
@@ -1337,7 +1335,7 @@ if(!data || data.length === 0){
 const { error: insertError } = await client
 .from("users")
 .insert({
-user_id: String(telegramUser),
+id: String(telegramUser),
 xp: 0,
 level: 1,
 invites: 0
@@ -1394,7 +1392,7 @@ document.getElementById("rankname").innerText =
 levelData[level]?.name || "👑 Max Level Ritter";
 
 document.getElementById("rankimg").src =
-levelData[level]?.img || levelData[20].img;
+levelData[level]?.img || levelData[10].img;
 
 document.getElementById("invitecount").innerText =
 user.invites || 0;
@@ -1448,7 +1446,7 @@ async function loadDaily(){
 const { data } = await client
 .from("users")
 .select("daily_last_claim, daily_streak")
-.eq("user_id", String(telegramUser))
+.eq("id", String(telegramUser))
 
 if(!data || !data.length) return;
 
@@ -1506,7 +1504,7 @@ async function claimDaily(){
     const { data, error } = await client
       .from("users")
       .select("daily_streak, daily_last_claim, xp")
-      .eq("user_id", String(telegramUser))
+      .eq("id", String(telegramUser))
       .single();
 
     if (error || !data) {
@@ -1536,7 +1534,7 @@ async function claimDaily(){
         daily_last_claim: now.toISOString(),
         xp: (data.xp || 0) + bonus
       })
-      .eq("user_id", String(telegramUser));
+      .eq("id", String(telegramUser))
 
     await loadUser();
     await loadDaily();
@@ -1554,7 +1552,7 @@ try{
 
 const { data } = await client
 .from("users")
-.select("user_id, xp, level")
+.select("id, xp, level")
 .order("xp", { ascending:false })
 .limit(5);
 
@@ -1565,7 +1563,7 @@ let html = "";
 data.forEach((u,index)=>{
 
 const hidden =
-String(u.user_id).substring(0,2) + "****";
+String(u.id).substring(0,2) + "****";
 
 html += `
 <div style="margin-bottom:12px;">
@@ -1580,12 +1578,12 @@ document.getElementById("leaderboard").innerHTML = html;
 
 const { data: allUsers } = await client
 .from("users")
-.select("user_id, xp, level")
+.select("id, xp, level")
 .order("xp", { ascending:false });
 
 if(allUsers){
 
-const myIndex = allUsers.findIndex(u => String(u.user_id) === String(telegramUser));
+const myIndex = allUsers.findIndex(u => String(u.id) === String(telegramUser));
 
 if(myIndex >= 0){
 
@@ -1623,14 +1621,14 @@ async function spinSlot(){
 const { data: u, error } = await client
   .from("users")
   .select("*")
-  .eq("user_id", String(telegramUser))
+  .eq("id", String(telegramUser))
   .maybeSingle();
 
 if (!u) {
   resultEl.innerText = "User fehlt → wird erstellt...";
 
   await client.from("users").insert({
-  user_id: String(telegramUser),
+  id: String(telegramUser),
     xp: 0,
     level: 1,
     slot_last_spin: null
@@ -1650,7 +1648,7 @@ try {
   const { data: u, error } = await client
   .from("users")
   .select("slot_last_spin, xp")
-  .eq("user_id", String(telegramUser))
+  .eq("id", String(telegramUser))
   .maybeSingle();
 
 if (error) {
@@ -1722,7 +1720,7 @@ if (!u) {
           xp: (u?.xp || 0) + xpGain,
           slot_last_spin: now.toISOString()
         })
-        .eq("user_id", String(telegramUser))
+        .eq("id", String(telegramUser))
         .then(() => loadUser());
 
       setTimeout(() => {
@@ -1743,323 +1741,7 @@ if (!u) {
 
 }
 
-async function startQueue(){
 
-const status = document.getElementById("pvpStatus");
-status.innerText = "🔎 Suche Gegner...";
-
-try{
-
-const { data: existing } = await client
-  .from("game_queue")
-  .select("*")
-  .eq("user_id", String(telegramUser))
-  .eq("status", "waiting");
-
-const q = existing?.[0];
-
-// 👉 WENN NICHT IN QUEUE → EINTRAGEN
-if(!q){
-
-  const { error } = await client
-    .from("game_queue")
-    .insert({
-      user_id: String(telegramUser),
-      status: "waiting"
-    });
-
-  if(error){
-    console.log(error);
-    status.innerText = "❌ Fehler beim Start";
-    return;
-  }
-
-  status.innerText = "✅ Wartet auf Gegner...";
-  return;
-}
-
-// 👉 wenn schon drin → Timeout prüfen
-const now = new Date();
-const created = new Date(q.created_at);
-
-const diff = (now - created) / 1000;
-
-if(diff > 60){
-
-  await client
-    .from("game_queue")
-    .delete()
-    .eq("id", q.id);
-
-  status.innerText = "⏱️ Suche abgebrochen (Timeout)";
-  return;
-}
-
-}catch(err){
-console.log(err);
-status.innerText = "❌ Fehler";
-}
-
-}
-
-async function checkMatch(){
-
-try{
-
-const { data } = await client
-.from("game_matches")
-.select("*")
-.or(`player1.eq.${String(telegramUser)},player2.eq.${String(telegramUser)}`)
-.eq("status", "active")
-.limit(1);
-
-if(!data || data.length === 0){
-return;
-}
-
-const match = data[0];
-
-window.currentMatch = match;
-
-let opponent = match.player1 == String(telegramUser)
-? match.player2
-: match.player1;
-
-document.getElementById("pvpStatus").innerText =
-"⚔️ Gegner gefunden: " + opponent;
-
-// Würfelbutton aktivieren
-document.getElementById("rollBtn").disabled = false;
-
-}catch(err){
-console.log(err);
-}
-
-}
-setInterval(checkMatch, 2000);
-
-async function rollDice(){
-
-const btn = document.getElementById("rollBtn");
-const result = document.getElementById("diceResult");
-
-if(!window.currentMatch){
-result.innerText = "Kein Match gefunden";
-return;
-}
-
-btn.disabled = true;
-
-const roll = Math.floor(Math.random() * 100) + 1;
-
-result.innerText = "🎲 Du hast gewürfelt: " + roll;
-
-const match = window.currentMatch;
-
-let update = {};
-
-if(match.player1 === String(telegramUser)){
-update.p1_roll = roll;
-}else{
-update.p2_roll = roll;
-}
-
-await client
-.from("game_matches")
-.update(update)
-.eq("id", match.id);
-
-await tryFinish(match.id);
-
-
-result.innerText += "\n⏳ Warte auf Gegner...";
-
-
-// ⭐⭐⭐ DAS IST DER WICHTIGE FIX
-await finishMatch();
-
-}
-
-async function checkFinish(){
-
-try{
-
-if(!window.currentMatch) return;
-
-const { data: m } = await client
-.from("game_matches")
-.select("*")
-.eq("id", window.currentMatch.id)
-.single();
-
-if(!m) return;
-
-const now = new Date();
-const created = new Date(m.created_at);
-const diff = (now - created) / 1000; // Sekunden
-
-// ⛔ Match zu alt + nicht fertig
-if(diff > 120 && (m.p1_roll == null || m.p2_roll == null)) {
-
-  await client
-    .from("game_matches")
-    .update({
-      status: "cancelled"
-    })
-    .eq("id", m.id);
-
-  document.getElementById("diceResult").innerText =
-    "⏱️ Match abgebrochen – Gegner hat nicht gewürfelt";
-
-  window.currentMatch = null;
-
-  return;
-}
-
-// ❗ noch nicht fertig → nichts tun
-if(m.status !== "finished") return;
-
-await loadMatchUsers(m);
-showResult(m);
-
-}catch(err){
-console.log("FINISH ERROR:", err);
-}
-
-}
-
-async function loadMatchUsers(m){
-
-const { data } = await client
-  .from("users")
-  .select("id, first_name, username")
-  .in("id", [m.player1, m.player2]);
-
-cachedUsers = data || [];
-
-}
-
-async function tryFinish(matchId){
-
-const { data: m } = await client
-.from("game_matches")
-.select("*")
-.eq("id", matchId)
-.single();
-
-if(!m) return;
-
-// nur 1x erlauben
-if(m.status === "finished" || m.status === "finishing") return;
-
-if(m.p1_roll == null || m.p2_roll == null) return;
-
-// LOCK setzen (wichtig!)
-await client
-.from("game_matches")
-.update({
-status: "finishing"
-})
-.eq("id", m.id);
-
-let winner = null;
-
-if(m.p1_roll > m.p2_roll){
-winner = m.player1;
-}
-else if(m.p2_roll > m.p1_roll){
-winner = m.player2;
-}
-else{
-winner = "draw";
-}
-
-// FINAL UPDATE
-await client
-.from("game_matches")
-.update({
-winner,
-status: "finished",
-match_finished: true
-})
-.eq("id", m.id);
-
-// XP nur hier!
-if(winner !== "draw"){
-
-const { data: user } = await client
-.from("users")
-.select("xp")
-.eq("user_id", winner)
-.single();
-
-await client
-.from("users")
-.update({
-xp: (user.xp || 0) + 2
-})
-.eq("user_id", winner);
-}
-
-}
-
-setInterval(checkFinish, 2000);
-
-function showResult(m){
-
-let yourRoll = 0;
-let enemyRoll = 0;
-
-if(String(telegramUser) === String(m.player1)){
-  yourRoll = m.p1_roll;
-  enemyRoll = m.p2_roll;
-}else{
-  yourRoll = m.p2_roll;
-  enemyRoll = m.p1_roll;
-}
-
-let enemyId =
-  String(telegramUser) === String(m.player1)
-    ? m.player2
-    : m.player1;
-
-let yourName = getName(telegramUser);
-let enemyName = getName(enemyId);
-
-let resultText = `
-🎲 Du: ${yourRoll}
-🎲 Gegner: ${enemyRoll}
-
-👤 Du: ${yourName}
-👤 Gegner: ${enemyName}
-`;
-
-if(m.winner === "draw"){
-  resultText += "\n🤝 Unentschieden!";
-}
-else if(String(telegramUser) === String(m.winner)){
-  resultText += "\n🏆 Du hast gewonnen!";
-  resultText += "\n⭐ +2 XP";
-}
-else{
-  resultText += "\n😅 Du hast verloren!";
-}
-
-document.getElementById("diceResult").innerText = resultText;
-
-}
-
-function getName(id){
-
-const u = cachedUsers.find(x => String(x.id) === String(id));
-
-if(!u) return id;
-
-return u.username
-  ? "@" + u.username
-  : u.first_name || id;
-
-}
 
 async function answerDaily(answer){
 
@@ -2149,8 +1831,7 @@ async function loadWmMatches(){
     const { data: myTips } = await client
       .from("wm_tips")
       .select("*")
-      .eq("user_id", String(telegramUser));
-
+      .eq("user_id", String(telegramUser))
     function getTip(matchId){
       return myTips?.find(t => String(t.match_id) === String(matchId));
     }
