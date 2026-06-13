@@ -948,7 +948,38 @@ Status: <b>Treasure Mode aktiv</b>
 <div id="wm" class="page">
 
 <h2>🏆 WM Tippspiel</h2>
+<div class="card">
 
+<div style="
+display:flex;
+justify-content:space-between;
+text-align:center;
+">
+
+<div>
+<div style="font-size:22px;font-weight:900;" id="wmPointsTop">
+0
+</div>
+<div>⭐ Punkte</div>
+</div>
+
+<div>
+<div style="font-size:22px;font-weight:900;" id="wmRankTop">
+-
+</div>
+<div>🏅 Rang</div>
+</div>
+
+<div>
+<div style="font-size:22px;font-weight:900;" id="wmTipsTop">
+0
+</div>
+<div>🎯 Tipps</div>
+</div>
+
+</div>
+
+</div>
 <!-- INFO CARD -->
 <div class="card">
 
@@ -2142,11 +2173,40 @@ async function loadWmMatches(){
             ${match.stage || "Spiel"}
           </div>
 
-          <div style="font-weight:900;">
-          ${match.home_flag || ""} ${match.home_team || "Home"}
-          vs
-          ${match.away_flag || ""} ${match.away_team || "Away"}
-        </div>
+          <div style="
+          text-align:center;
+          margin-top:10px;
+          ">
+
+          <div style="
+          font-size:42px;
+          margin-bottom:10px;
+          ">
+          ${match.home_flag || ""} ⚔️ ${match.away_flag || ""}
+          </div>
+
+<div style="
+font-size:20px;
+font-weight:900;
+">
+${match.home_team || "Home"}
+</div>
+
+<div style="
+margin:6px 0;
+opacity:0.7;
+">
+VS
+</div>
+
+<div style="
+font-size:20px;
+font-weight:900;
+">
+${match.away_team || "Away"}
+</div>
+
+</div>
 
         <div style="
           margin-top:4px;
@@ -2169,12 +2229,56 @@ async function loadWmMatches(){
             Ergebnis: ${match.home_score} : ${match.away_score}
           </div>
 `         : ""}
-          <div style="display:flex;gap:10px;margin:10px 0;">
-            <input id="home_${match.id}" type="number" placeholder="0" style="flex:1;"
-              value="${tip?.home_tip || ""}">
+          <div style="
+           display:flex;
+           justify-content:center;
+           align-items:center;
+           gap:15px;
+           margin:18px 0;
+           ">
+            <input
+             id="home_${match.id}"
+             type="number"
+             placeholder="0"
 
-            <input id="away_${match.id}" type="number" placeholder="0" style="flex:1;"
-              value="${tip?.away_tip || ""}">
+             style="
+             width:70px;
+             height:70px;
+
+             font-size:28px;
+             font-weight:900;
+
+             text-align:center;
+
+             border-radius:18px;
+             border:none;
+
+             background:rgba(255,255,255,0.12);
+             color:white;
+"
+             value="${tip?.home_tip || ""}">
+
+            <input
+             id="away_${match.id}"
+             type="number"
+             placeholder="0"
+
+             style="
+             width:70px;
+             height:70px;
+
+             font-size:28px;
+             font-weight:900;
+
+             text-align:center;
+
+             border-radius:18px;
+             border:none;
+
+             background:rgba(255,255,255,0.12);
+             color:white;
+"
+             value="${tip?.away_tip || ""}">
           </div>
 
           <button onclick="saveTip(${match.id})">
@@ -2182,10 +2286,30 @@ async function loadWmMatches(){
           </button>
 
           ${tip ? `
-            <div style="margin-top:10px;font-weight:600;opacity:0.85;">
-              🎯 Dein Tipp: ${tip.home_tip} : ${tip.away_tip}
-            </div>
-          ` : ""}
+<div style="
+margin-top:12px;
+
+padding:10px;
+
+border-radius:14px;
+
+background:
+rgba(0,255,120,0.12);
+
+border:
+1px solid rgba(0,255,120,0.25);
+
+font-weight:700;
+">
+
+✅ Tipp abgegeben
+
+<br><br>
+
+🎯 ${tip.home_tip} : ${tip.away_tip}
+
+</div>
+` : ""}
 
         </div>
       `;
