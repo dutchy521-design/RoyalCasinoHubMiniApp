@@ -1004,6 +1004,11 @@ style="width:100%;margin-bottom:10px;display:none;">
 
 <div class="card">
 <h3>⚽ Spiele</h3>
+<button onclick="loadPastMatches()">
+📜 Vergangene Spiele anzeigen
+</button>
+
+<div id="pastMatches" style="margin-top:15px;"></div>
 <div id="wmMatches">Lädt Spiele...</div>
 </div>
 
@@ -2716,6 +2721,77 @@ setInterval(async () => {
 
 }, 10000);
 
+async function loadPastMatches(){
+
+  const container = document.getElementById("pastMatches");
+
+  try{
+
+    const { data: matches } = await client
+      .from("wm_matches")
+      .select("*")
+      .lt("start_time", new Date().toISOString())
+      .order("start_time", { ascending:false });
+
+    const { data: myTips } = await client
+      .from("wm_tips")
+      .select("*")
+      .eq("user_id", String(telegramUser));
+
+    if(!matches || matches.length === 0){
+      container.innerHTML = "Keine vergangenen Spiele";
+      return;
+    }
+
+    let html = "";
+
+    matches.forEach(match => {
+
+      const tip = myTips?.find(
+        t => String(t.match_id) === String(match.id)
+      );
+
+      html += `
+        <div class="card">
+
+          <div style="font-weight:900;">
+            ${match.home_flag || ""} ${match.home_team}
+            vs
+            ${match.away_flag || ""} ${match.away_team}
+          </div>
+
+          <div style="margin-top:8px;">
+            🏆 Ergebnis:
+            <b>${match.home_score ?? "-"} : ${match.away_score ?? "-"}</b>
+          </div>
+
+          <div style="margin-top:8px;">
+            🎯 Dein Tipp:
+            <b>
+              ${
+                tip
+                ? `${tip.home_tip} : ${tip.away_tip}`
+                : "Nicht getippt"
+              }
+            </b>
+          </div>
+
+          <div style="margin-top:8px;">
+            ⭐ Punkte:
+            <b>${tip?.points || 0}</b>
+          </div>
+
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+
+  }catch(err){
+    console.log(err);
+    container.innerHTML = "Fehler beim Laden";
+  }
+}
 </script>
 
 </body>
