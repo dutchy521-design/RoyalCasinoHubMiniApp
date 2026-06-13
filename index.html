@@ -1360,16 +1360,35 @@ const level = user.level || 1;
 document.getElementById("xp").innerText = xp;
 document.getElementById("level").innerText = level;
 
+const MAX_LEVEL = 10;
+
+if(level >= MAX_LEVEL){
+
+document.getElementById("xpfill").style.width = "100%";
+
+document.getElementById("nextlevel").innerText =
+"🏛️ Maximales Level erreicht";
+
+}else{
+
 const current = (level - 1) * 100;
 const next = level * 100;
 
-let progress = ((xp - current) / (next - current)) * 100;
-progress = Math.max(0, Math.min(progress, 100));
+let progress =
+((xp - current) / (next - current)) * 100;
 
-document.getElementById("xpfill").style.width = progress + "%";
+progress = Math.max(
+0,
+Math.min(progress,100)
+);
+
+document.getElementById("xpfill").style.width =
+progress + "%";
 
 document.getElementById("nextlevel").innerText =
-`${next - xp} XP bis Level ${level + 1}`;
+`${Math.max(0,next - xp)} XP bis Level ${level + 1}`;
+
+}
 
 document.getElementById("rankname").innerText =
 levelData[level]?.name || "👑 Max Level Ritter";
