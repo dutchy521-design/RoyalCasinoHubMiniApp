@@ -743,27 +743,30 @@ opacity:1;
 
 box-shadow:
 0 0 20px rgba(255,0,255,0.4);
-}
+
 border:1px solid rgba(255,215,0,0.4);
+}
+
 .hero-header{
   text-align:center;
   padding:25px 10px 10px;
 }
 
 .hero-logo{
-  width:200px;
-  height:auto;
-  object-fit:contain;
+display:block;
+margin:0 auto 15px auto;
 
-  margin-bottom:12px;
+width:220px;
+max-width:80%;
 
-  filter:
-    drop-shadow(0 20px 35px rgba(0,0,0,0.35))
-    drop-shadow(0 0 25px rgba(255,140,60,0.25));
+height:auto;
 
-  animation: logoFloat 3.5s ease-in-out infinite,
-             logoGlow 2.5s ease-in-out infinite;
-  transform-origin:center;
+filter:
+drop-shadow(0 0 25px rgba(255,0,255,0.45))
+drop-shadow(0 0 15px rgba(255,215,0,0.35));
+
+animation:
+logoFloat 3.5s ease-in-out infinite;
 }
 
 /* sanftes Schweben */
@@ -796,6 +799,11 @@ border:1px solid rgba(255,215,0,0.4);
   margin:0;
   font-size:26px;
   font-weight:900;
+
+  text-align:center;
+  width:100%;
+
+
   color:#ffd700;
   text-shadow:
     0 0 10px rgba(255,215,0,0.5),
