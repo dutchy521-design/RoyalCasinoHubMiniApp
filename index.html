@@ -1,0 +1,2687 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>Royal Casino Hub</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+body{
+margin:0;
+font-family: Arial, sans-serif;
+
+/* warmes soft background */
+background:
+radial-gradient(circle at 15% 10%, #ffd2a6 0%, transparent 45%),
+radial-gradient(circle at 85% 25%, #ffb36b 0%, transparent 50%),
+radial-gradient(circle at 50% 90%, #ffc98f 0%, transparent 55%),
+linear-gradient(180deg, #f3e3d2, #e8d2bd);
+
+color:#2b1d14;
+}
+
+/* subtle pattern overlay */
+body::before{
+content:"";
+position:fixed;
+inset:0;
+background-image: radial-gradient(rgba(255,140,60,0.08) 1px, transparent 1px);
+background-size: 18px 18px;
+pointer-events:none;
+opacity:0.6;
+}
+
+/* PAGES */
+.page{
+display:none;
+padding:22px;
+padding-bottom:110px;
+}
+.active{display:block;}
+
+/* CARDS (bubble style) */
+.card{
+background: linear-gradient(145deg, #fff3e6, #ffe8d6);
+border-radius: 22px;
+padding: 18px;
+margin-bottom: 14px;
+
+border: 1px solid rgba(255,140,60,0.18);
+
+box-shadow:
+12px 12px 22px rgba(0,0,0,0.10),
+-6px -6px 14px rgba(255,255,255,0.65),
+inset 0 1px 0 rgba(255,255,255,0.8);
+
+backdrop-filter: blur(10px);
+transition: 0.25s;
+}
+
+.card:hover{
+transform: translateY(-3px);
+box-shadow:
+0 14px 30px rgba(255,140,60,0.18);
+}
+
+/* BUTTONS (bubble / pill) */
+button{
+width:100%;
+padding:13px;
+border:none;
+border-radius:999px;
+background: linear-gradient(135deg, #ff9a3c, #ff6b2c);
+color:white;
+font-weight:700;
+margin-top:10px;
+cursor:pointer;
+transition: 0.2s;
+
+box-shadow:
+0 10px 22px rgba(255,120,40,0.28),
+inset 0 2px 0 rgba(255,255,255,0.35),
+inset 0 -3px 0 rgba(0,0,0,0.08);
+}
+
+button:hover{
+transform: scale(1.03);
+box-shadow: 0 12px 26px rgba(255,120,40,0.35);
+}
+
+button:active{
+transform: scale(0.98);
+}
+
+/* XP BAR */
+.xp-bar{
+height:14px;
+background: rgba(0,0,0,0.08);
+border-radius:999px;
+overflow:hidden;
+margin-top:10px;
+}
+
+.xp-fill{
+height:100%;
+width:0%;
+background: linear-gradient(90deg, #ff9a3c, #ff6b2c);
+transition: 0.8s ease;
+}
+
+/* NAVBAR (soft glass orange tint) */
+.navbar{
+position:fixed;
+bottom:14px;
+left:12px;
+right:12px;
+
+display:flex;
+justify-content:space-around;
+align-items:center;
+
+padding:10px 8px;
+
+background: rgba(255, 240, 225, 0.55);
+backdrop-filter: blur(18px);
+
+border: 1px solid rgba(255,140,60,0.25);
+border-radius: 18px;
+
+box-shadow:
+0 18px 40px rgba(0,0,0,0.18),
+inset 0 1px 0 rgba(255,255,255,0.6);
+
+z-index:999;
+}
+
+.navbtn{
+flex:1;
+
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+
+padding:8px 0;
+
+background:transparent;
+border:none;
+
+color:#4a2b1a;
+font-size:12px;
+font-weight:700;
+
+opacity:0.7;
+transition:0.25s;
+
+border-radius:12px;
+}
+
+.navbtn:hover{
+opacity:1;
+transform: translateY(-2px);
+background: rgba(255,140,60,0.12);
+}
+
+.navbtn:active{
+transform: scale(0.96);
+}
+
+.navbtn:hover{
+opacity:1;
+transform: translateY(-1px);
+}
+
+/* SLOT (orange glow) */
+/* SLOT (orange glow) */
+#slotDisplay{
+  width:260px;
+  height:130px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  margin:0 auto;
+
+  font-size:58px !important;
+  letter-spacing:12px;
+  font-weight:900;
+
+  color:#fff8ef;
+
+  border-radius:26px;
+
+  background:
+    linear-gradient(180deg, #3b2a1d 0%, #1f140d 100%);
+
+  border:
+    4px solid #ffb15e;
+
+  box-shadow:
+    0 25px 45px rgba(0,0,0,0.28),
+    inset 0 4px 10px rgba(255,255,255,0.08),
+    inset 0 -10px 20px rgba(0,0,0,0.35),
+    0 0 30px rgba(255,145,50,0.25);
+
+  position:relative;
+
+  overflow:hidden;
+
+  text-shadow:
+    0 3px 0 rgba(0,0,0,0.35),
+    0 0 12px rgba(255,180,80,0.35);
+
+transform: perspective(500px) rotateX(4deg);
+}
+
+/* obere glänzende leiste */
+#slotDisplay::before{
+  content:"";
+
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+
+  height:30%;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.22),
+      rgba(255,255,255,0)
+    );
+
+  pointer-events:none;
+}
+
+/* slot walzen look */
+#slotDisplay::after{
+  content:"";
+
+  position:absolute;
+  inset:0;
+
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,0.04) 0px,
+      rgba(255,255,255,0.04) 2px,
+      transparent 2px,
+      transparent 86px
+    );
+
+  pointer-events:none;
+}
+
+.slot-rolling{
+  animation:
+    slotSpin 0.10s linear infinite,
+    slotGlow 1s ease infinite;
+}
+
+@keyframes slotGlow{
+  0%{
+    box-shadow:
+      0 0 18px rgba(255,140,60,0.18);
+  }
+
+  50%{
+    box-shadow:
+      0 0 38px rgba(255,170,70,0.45);
+  }
+
+  100%{
+    box-shadow:
+      0 0 18px rgba(255,140,60,0.18);
+  }
+}
+
+@keyframes slotSpin{
+  0%{transform:translateY(-5px);}
+  50%{transform:translateY(5px);}
+  100%{transform:translateY(-5px);}
+}
+
+.slot-jackpot{
+  animation: jackpotGlow 0.6s infinite;
+}
+
+@keyframes jackpotGlow{
+  0%{box-shadow:0 0 10px rgba(255,140,60,0.25);}
+  50%{box-shadow:0 0 25px rgba(255,140,60,0.45);}
+  100%{box-shadow:0 0 10px rgba(255,140,60,0.25);}
+}
+
+/* TEXT */
+h2,h3{
+color:#3a2418;
+}
+
+small{
+opacity:0.7;
+}
+
+input{
+background: rgba(255,255,255,0.6);
+border: 1px solid rgba(255,140,60,0.2);
+color:#2b1d14;
+border-radius:12px;
+padding:10px;
+}
+
+/* DAILY GLOW */
+@keyframes glow {
+0% { box-shadow:0 0 0 rgba(255,140,60,0); }
+50% { box-shadow:0 0 18px rgba(255,140,60,0.25); }
+100% { box-shadow:0 0 0 rgba(255,140,60,0); }
+}
+
+.daily-active{
+animation: glow 1.2s infinite;
+}
+
+.slot-wrapper{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+
+  text-align:center;
+  padding:18px;
+
+  background: linear-gradient(145deg, #ffe8d6, #ffd7b3);
+  border-radius: 24px;
+
+  box-shadow:
+    12px 12px 22px rgba(0,0,0,0.10),
+    -6px -6px 14px rgba(255,255,255,0.6);
+
+  border: 1px solid rgba(255,140,60,0.15);
+}
+
+.slot-header{
+  font-weight:900;
+  font-size:18px;
+  letter-spacing:0.5px;
+
+  color:#3a2418;
+
+  text-shadow:
+    0 2px 0 rgba(0,0,0,0.15),
+    0 6px 12px rgba(0,0,0,0.12);
+}
+
+.slot-sub{
+  margin-top:8px;
+  font-size:13px;
+  font-weight:600;
+  opacity:0.75;
+
+  text-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.card-title{
+font-weight:700;
+font-size:15px;
+margin-bottom:4px;
+}
+
+.card-sub{
+font-size:13px;
+opacity:0.7;
+}
+
+.card-sub{
+font-size:13px;
+opacity:0.7;
+}
+
+/* DEAL CARDS */
+.deal-card{
+position:relative;
+
+overflow:hidden;
+
+padding:20px;
+border-radius:24px;
+
+background:
+linear-gradient(145deg,#fff1e3,#ffd8b3);
+
+border:1px solid rgba(255,145,60,0.20);
+
+box-shadow:
+0 18px 35px rgba(0,0,0,0.12),
+inset 0 1px 0 rgba(255,255,255,0.7);
+
+transition:0.25s;
+}
+
+.mrpunter-featured{
+  position: relative;
+  overflow: hidden;
+}
+
+.deal-card:hover{
+transform:translateY(-4px) scale(1.01);
+
+box-shadow:
+0 24px 45px rgba(255,145,60,0.22);
+}
+
+.deal-card::before{
+content:"";
+
+position:absolute;
+top:-50px;
+right:-50px;
+
+width:140px;
+height:140px;
+
+background:
+radial-gradient(circle,
+rgba(255,180,80,0.35),
+transparent 70%);
+
+pointer-events:none;
+}
+
+@keyframes fireMove {
+  0% { transform: scale(1) translateY(0px); opacity: 0.4; }
+  100% { transform: scale(1.1) translateY(-6px); opacity: 0.7; }
+}
+
+.mrpunter-featured::after {
+  content: "🔥";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 28px;
+  animation: flicker 0.8s infinite;
+  z-index: 2;
+}
+
+@keyframes flicker {
+  0% { transform: rotate(-5deg) scale(1); opacity:0.7; }
+  50% { transform: rotate(5deg) scale(1.2); opacity:1; }
+  100% { transform: rotate(-3deg) scale(1); opacity:0.8; }
+}
+
+.mrpunter-featured::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 20% 10%, rgba(255,120,0,0.45), transparent 65%);
+  animation: fireMove 2s infinite alternate;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.mrpunter-featured > * {
+  position: relative;
+  z-index: 2;
+}
+
+.deal-top{
+display:flex;
+align-items:center;
+justify-content:space-between;
+
+margin-bottom:14px;
+}
+
+.deal-logo{
+font-size:34px;
+}
+
+.deal-badge{
+padding:6px 12px;
+border-radius:999px;
+
+font-size:11px;
+font-weight:800;
+
+background:linear-gradient(135deg,#ffb347,#ff7b2c);
+color:white;
+
+letter-spacing:0.5px;
+
+box-shadow:
+0 6px 12px rgba(255,120,40,0.25);
+}
+
+.deal-title{
+font-size:22px;
+font-weight:900;
+
+color:#3b2417;
+
+margin-bottom:6px;
+}
+
+.deal-text{
+font-size:14px;
+line-height:1.4;
+opacity:0.78;
+
+margin-bottom:16px;
+}
+
+.deal-btn{
+width:100%;
+
+padding:14px;
+
+border:none;
+border-radius:16px;
+
+font-weight:900;
+font-size:15px;
+
+background:
+linear-gradient(135deg,#ff9a3c,#ff6b2c);
+
+color:white;
+
+cursor:pointer;
+
+box-shadow:
+0 10px 20px rgba(255,120,40,0.30);
+
+transition:0.2s;
+}
+
+.deal-btn:hover{
+transform:scale(1.02);
+}
+
+.featured-deal{
+background:
+linear-gradient(145deg,#ffcf91,#ffb15e);
+
+border:2px solid rgba(255,255,255,0.4);
+}
+
+/* ===== PREMIUM DEAL HEADER STYLE ===== */
+
+.deal-card{
+  position:relative;
+  overflow:hidden;
+  padding:18px;
+  border-radius:24px;
+  background: linear-gradient(145deg, #fff1e3, #ffd8b3);
+  border: 1px solid rgba(255,145,60,0.25);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+  transition: all 0.25s ease;
+  font-family: Arial, sans-serif;
+}
+
+.deal-card:hover{
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 25px 50px rgba(255,140,60,0.25);
+}
+
+/* TOP ROW */
+.deal-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+
+.deal-logo{
+  width:42px;
+  height:42px;
+  border-radius:12px;
+  object-fit:cover;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+
+/* BADGE */
+.deal-badge{
+  font-size:11px;
+  font-weight:900;
+  padding:5px 10px;
+  border-radius:999px;
+  background: linear-gradient(135deg,#ffb347,#ff7b2c);
+  color:white;
+  box-shadow:0 8px 16px rgba(255,120,40,0.25);
+  letter-spacing:0.5px;
+}
+
+/* TITLE */
+.deal-title{
+  font-size:18px;
+  font-weight:900;
+  margin:6px 0;
+  color:#3a2418;
+}
+
+/* TEXT */
+.deal-text{
+  font-size:13px;
+  opacity:0.75;
+  margin-bottom:12px;
+}
+
+/* CTA BUTTON */
+.deal-btn{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:14px;
+  font-weight:900;
+  background: linear-gradient(135deg,#ff9a3c,#ff6b2c);
+  color:white;
+  box-shadow:0 10px 20px rgba(255,120,40,0.25);
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.deal-btn:hover{
+  transform: scale(1.03);
+}
+
+.sg-glitter{
+  position: relative;
+  overflow: hidden;
+}
+
+/* animierter Glanzstreifen */
+.sg-glitter::before{
+  content:"";
+  position:absolute;
+  top:-60%;
+  left:-60%;
+  width:220%;
+  height:220%;
+
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    rgba(255,255,255,0) 40%,
+    rgba(255,255,255,0.35) 50%,
+    rgba(255,255,255,0) 60%,
+    transparent 100%
+  );
+
+  transform: rotate(25deg);
+  animation: shine 2.5s infinite;
+  pointer-events:none;
+}
+
+@keyframes shine{
+  0% { transform: translateX(-70%) rotate(25deg); }
+  100% { transform: translateX(70%) rotate(25deg); }
+}
+
+.deal-card{
+  position: relative;
+  overflow: hidden;
+}
+
+/* GLOBALER GLANZ FÜR ALLE KARTEN */
+.deal-card::after{
+  content:"";
+  position:absolute;
+  top:-60%;
+  left:-60%;
+  width:220%;
+  height:220%;
+
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    rgba(255,255,255,0) 40%,
+    rgba(255,255,255,0.25) 50%,
+    rgba(255,255,255,0) 60%,
+    transparent 100%
+  );
+
+  transform: rotate(25deg);
+  animation: cardShine 3s infinite;
+  pointer-events:none;
+}
+
+@keyframes cardShine{
+  0% { transform: translateX(-70%) rotate(25deg); }
+  100% { transform: translateX(70%) rotate(25deg); }
+}
+
+.hot-sticker{
+  position:absolute;
+  top:12px;
+  right:12px;
+
+  padding:6px 10px;
+  border-radius:999px;
+
+  font-size:11px;
+  font-weight:900;
+  color:white;
+
+  background: linear-gradient(135deg, #ff3b30, #ff9500);
+  box-shadow: 0 8px 18px rgba(255,80,40,0.35);
+
+  z-index: 5;
+
+  transform: rotate(8deg);
+}
+
+.navbtn.active{
+background: linear-gradient(135deg,#ff9a3c,#ff6b2c);
+color:white;
+opacity:1;
+box-shadow:0 10px 20px rgba(255,120,40,0.25);
+}
+
+.hero-header{
+  text-align:center;
+  padding:25px 10px 10px;
+}
+
+.hero-logo{
+  width:200px;
+  height:auto;
+  object-fit:contain;
+
+  margin-bottom:12px;
+
+  filter:
+    drop-shadow(0 20px 35px rgba(0,0,0,0.35))
+    drop-shadow(0 0 25px rgba(255,140,60,0.25));
+
+  animation: logoFloat 3.5s ease-in-out infinite,
+             logoGlow 2.5s ease-in-out infinite;
+  transform-origin:center;
+}
+
+/* sanftes Schweben */
+@keyframes logoFloat{
+  0% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-8px) scale(1.02); }
+  100% { transform: translateY(0px) scale(1); }
+}
+
+/* Glow Pulse */
+@keyframes logoGlow{
+  0% {
+    filter:
+      drop-shadow(0 20px 35px rgba(0,0,0,0.35))
+      drop-shadow(0 0 10px rgba(255,140,60,0.15));
+  }
+  50% {
+    filter:
+      drop-shadow(0 25px 45px rgba(0,0,0,0.45))
+      drop-shadow(0 0 35px rgba(255,140,60,0.45));
+  }
+  100% {
+    filter:
+      drop-shadow(0 20px 35px rgba(0,0,0,0.35))
+      drop-shadow(0 0 10px rgba(255,140,60,0.15));
+  }
+}
+
+.hero-header h1{
+  margin:0;
+  font-size:26px;
+  font-weight:900;
+  color:#3a2418;
+}
+
+@keyframes floatLogo{
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0px); }
+}
+</style>
+</head>
+
+<body>
+
+<!-- HOME -->
+<div id="home" class="page active">
+<div class="hero-header">
+  <img src="https://i.imgur.com/DU7MD1C.png" class="hero-logo">
+  <h1>Willkommen</h1>
+</div>
+
+<div class="card">
+Level: <b id="level">Lädt...</b><br>
+XP: <b id="xp">Lädt...</b>
+
+<div class="xp-bar">
+<div class="xp-fill" id="xpfill"></div>
+</div>
+
+<div id="nextlevel" style="margin-top:8px;opacity:0.7;">
+Lädt...
+</div>
+</div>
+
+<div class="card" onclick="show('wm')" style="cursor:pointer;">
+
+  <div style="
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  ">
+
+    <div>
+      <div style="
+        font-size:22px;
+        font-weight:900;
+      ">
+        🏆 WM Tippspiel
+      </div>
+
+      <div style="
+        opacity:0.75;
+        margin-top:6px;
+        font-size:14px;
+      ">
+        Spiele tippen, Fragen beantworten & Punkte sammeln
+      </div>
+    </div>
+
+    <div style="font-size:42px;">
+      ⚽
+    </div>
+
+  </div>
+
+</div>
+
+<div class="card">
+🎰 Slot Machine
+
+<div class="slot-wrapper">
+  <div class="slot-header">🎰 Casino Slot</div>
+
+  <div id="slotDisplay">
+    🍒 🍒 🍒
+  </div>
+
+  <div class="slot-sub">Dreh und gewinne XP!</div>
+</div>
+
+<button id="spinBtn" onclick="spinSlot()">
+SPIN
+</button>
+
+<div id="slotResult" style="margin-top:10px;font-weight:bold;text-align:center;">
+--
+</div>
+</div>
+
+<!-- 🔥 DAILY BONUS (NEU) -->
+<div class="card" id="dailyCard">
+<h3>🎁 Daily Bonus</h3>
+<div>Streak: <b id="streak">0</b> 🔥</div>
+<div id="cooldown">Lädt...</div>
+
+<button id="dailyBtn" onclick="claimDaily()">
+Daily abholen
+</button>
+</div>
+
+<div class="card">
+Status: <b>Treasure Mode aktiv</b>
+</div>
+</div>
+
+<!-- WM -->
+<div id="wm" class="page">
+
+<h2>🏆 WM Tippspiel</h2>
+
+<!-- INFO CARD -->
+<div class="card">
+
+<h3>⚽ Willkommen zur WM</h3>
+
+<div style="opacity:0.8;line-height:1.5;">
+
+• Tippe alle WM Spiele<br>
+• Beantworte Bonusfragen<br>
+• Frage des Tages täglich neu<br>
+• Sammle Punkte im Ranking<br>
+• Gewinne am Ende Rewards 🎁
+
+</div>
+
+</div>
+
+<!-- SONDERTIPPS -->
+<div class="card">
+
+<h3>🏆 WM Sondertipps</h3>
+
+<div style="margin-bottom:10px;">
+Diese Tipps können nur einmal abgegeben werden.
+</div>
+
+<select id="worldChampion" style="width:100%;margin-bottom:10px;">
+<option value="">🏆 Weltmeister</option>
+<option>Deutschland</option>
+<option>Brasilien</option>
+<option>Argentinien</option>
+<option>Frankreich</option>
+<option>Spanien</option>
+<option>Portugal</option>
+<option>England</option>
+</select>
+
+<select id="germanyResult" style="width:100%;margin-bottom:10px;">
+<option value="">🇩🇪 Deutschland erreicht...</option>
+<option>Gruppenphase</option>
+<option>Achtelfinale</option>
+<option>Viertelfinale</option>
+<option>Halbfinale</option>
+<option>Finale</option>
+<option>Weltmeister</option>
+</select>
+
+<select id="topScorer" style="width:100%;margin-bottom:10px;">
+<option value="">⚽ Torschützenkönig</option>
+<option>Mbappé</option>
+<option>Kane</option>
+<option>Musiala</option>
+<option>Vinicius Jr.</option>
+<option>Haaland</option>
+<option>Anderer Spieler</option>
+</select>
+<input
+id="otherTopScorer"
+type="text"
+placeholder="Name eingeben"
+style="width:100%;margin-bottom:10px;display:none;">
+
+<button onclick="saveSpecialTips()">
+💾 Sondertipps speichern
+</button>
+
+<div id="specialTipsResult" style="margin-top:10px;"></div>
+<div id="mySpecialTips" style="margin-top:15px;"></div>
+</div>
+
+<div class="card">
+  <h3>🏆 WM Leaderboard</h3>
+
+  <div id="wmLeaderboard">Lädt...</div>
+
+  <div style="margin-top:15px;">
+    <b>📍 Deine Punkte</b>
+    <div id="myWmRank" style="margin-top:8px;opacity:0.9;">
+      Lädt...
+    </div>
+  </div>
+</div>
+
+<!-- SPIEL -->
+<div class="card">
+
+<div class="card">
+<h3>⚽ Spiele</h3>
+<div id="wmMatches">Lädt Spiele...</div>
+</div>
+
+</div>
+
+<!-- BACK BUTTON -->
+<button onclick="show('home')">
+⬅️ Zurück
+</button>
+
+</div>
+
+<!-- DEALS -->
+<div id="deals" class="page">
+<h2>🎁 Deals</h2>
+
+<div class="deal-card mrpunter-featured">
+  <div class="hot-sticker">🔥 HOT</div>
+
+  <!-- TOP: Logo + Badge -->
+  <div class="deal-top">
+
+    <!-- LOGO (hier nur Domain einsetzen) -->
+    <img class="deal-logo"
+      src="https://www.google.com/s2/favicons?domain=mrpunter.com&sz=64">
+
+    <!-- BADGE -->
+    <div class="deal-badge">MEGA-DEAL</div>
+
+  </div>
+
+  <!-- TITLE -->
+  <div class="deal-title">
+    🎩 MR.PUNTER
+  </div>
+
+  <!-- DESCRIPTION -->
+  <div class="deal-text">
+    MEGA DEAL mit LEVEL UP bei Registrierung+Einzahlung
+  </div>
+
+  <!-- BUTTON -->
+  <button class="deal-btn"
+    onclick="window.open('https://mrp.naralvin.com/?mid=371120_2143474','_blank')">
+
+    JETZT LOSLEGEN
+
+  </button>
+
+</div>
+
+
+<div class="deal-card">
+
+  <!-- TOP: Logo + Badge -->
+  <div class="deal-top">
+
+    <!-- LOGO (hier nur Domain einsetzen) -->
+    <img class="deal-logo"
+      src="https://www.google.com/s2/favicons?domain=stakejoker.com&sz=64">
+
+    <!-- BADGE -->
+    <div class="deal-badge">XP-BOOST</div>
+
+  </div>
+
+  <!-- TITLE -->
+  <div class="deal-title">
+    🃏 StakeJoker
+  </div>
+
+  <!-- DESCRIPTION -->
+  <div class="deal-text">
+    XP Booster
+  </div>
+
+  <!-- BUTTON -->
+  <button class="deal-btn"
+    onclick="window.open('https://offers.stakejoker.com/?offer=3&uid=019e15bf-d7ff-768a-a79b-d80bd7a4c0b6','_blank')">
+
+    JETZT STARTEN
+
+  </button>
+
+</div>
+
+<div class="deal-card sg-glitter">
+
+  <div class="deal-top">
+    <img class="deal-logo" src="https://www.google.com/s2/favicons?domain=sgcasino.com&sz=64">
+    <div class="deal-badge">EXKLUSIV</div>
+  </div>
+
+  <div class="deal-title">🐧SGCasino</div>
+
+  <div class="deal-text">
+    100% Bonus + 200 Freispiele Code: RITTER2026
+  </div>
+
+  <button class="deal-btn"
+    onclick="window.open('https://sgc.monalvor.com/?mid=371601_2146751','_blank')">
+    JETZT STARTEN
+  </button>
+
+</div>
+
+<div class="deal-card">
+
+  <!-- TOP: Logo + Badge -->
+  <div class="deal-top">
+
+    <!-- LOGO (hier nur Domain einsetzen) -->
+    <img class="deal-logo"
+      src="https://www.google.com/s2/favicons?domain=alfcasino.com&sz=64">
+
+    <!-- BADGE -->
+    <div class="deal-badge">XP-BOOST</div>
+
+  </div>
+
+  <!-- TITLE -->
+  <div class="deal-title">
+    👽 Alf Casino
+  </div>
+
+  <!-- DESCRIPTION -->
+  <div class="deal-text">
+    100% Bonus + 200 Freispiele Code: RITTER2026
+  </div>
+
+  <!-- BUTTON -->
+  <button class="deal-btn"
+    onclick="window.open('https://alcw.monalvor.com/?mid=371601_2146754','_blank')">
+
+    DEAL SICHERN
+
+  </button>
+
+</div>
+
+<div class="deal-card">
+
+  <!-- TOP: Logo + Badge -->
+  <div class="deal-top">
+
+    <!-- LOGO (hier nur Domain einsetzen) -->
+    <img class="deal-logo"
+      src="https://www.google.com/s2/favicons?domain=gunsbet.com&sz=64">
+
+    <!-- BADGE -->
+    <div class="deal-badge">XP-BOOST</div>
+
+  </div>
+
+  <!-- TITLE -->
+  <div class="deal-title">
+    🔫 Gunsbet
+  </div>
+
+  <!-- DESCRIPTION -->
+  <div class="deal-text">
+    XP-Booster
+  </div>
+
+  <!-- BUTTON -->
+  <button class="deal-btn"
+    onclick="window.open('https://gunsbetlink.com/h2briwudx','_blank')">
+
+    JETZT AUSPROBIEREN
+
+  </button>
+
+</div>
+
+<div class="deal-card">
+
+  <!-- TOP: Logo + Badge -->
+  <div class="deal-top">
+
+    <!-- LOGO (hier nur Domain einsetzen) -->
+    <img class="deal-logo"
+      src="https://www.google.com/s2/favicons?domain=neospin.com&sz=64">
+
+    <!-- BADGE -->
+    <div class="deal-badge">XP-BOOST</div>
+
+  </div>
+
+  <!-- TITLE -->
+  <div class="deal-title">
+   🧨 Neospin
+  </div>
+
+  <!-- DESCRIPTION -->
+  <div class="deal-text">
+    XP-Booster
+  </div>
+
+  <!-- BUTTON -->
+  <button class="deal-btn"
+    onclick="window.open('https://neospinlink.com/hxfz5pzin','_blank')">
+
+    BONUS SICHERN
+
+  </button>
+
+</div>
+
+<div class="deal-card">
+
+  <!-- TOP: Logo + Badge -->
+  <div class="deal-top">
+
+    <!-- LOGO (hier nur Domain einsetzen) -->
+    <img class="deal-logo"
+      src="https://www.google.com/s2/favicons?domain=evospin-de.com&sz=64">
+
+    <!-- BADGE -->
+    <div class="deal-badge">XP-BOOST</div>
+
+  </div>
+
+  <!-- TITLE -->
+  <div class="deal-title">
+   ⚡️ Evospin
+  </div>
+
+  <!-- DESCRIPTION -->
+  <div class="deal-text">
+    XP-Booster
+  </div>
+
+  <!-- BUTTON -->
+  <button class="deal-btn"
+    onclick="window.open('https://evospinlink.com/hgnofgc6i','_blank')">
+
+    JETZT STARTEN
+
+  </button>
+
+</div>
+
+<div class="deal-card">
+
+  <!-- TOP: Logo + Badge -->
+  <div class="deal-top">
+
+    <!-- LOGO (hier nur Domain einsetzen) -->
+    <img class="deal-logo"
+      src="https://www.google.com/s2/favicons?domain=crownslots.com&sz=64">
+
+    <!-- BADGE -->
+    <div class="deal-badge">XP-BOOST</div>
+
+  </div>
+
+  <!-- TITLE -->
+  <div class="deal-title">
+   👑 Crownslots
+  </div>
+
+  <!-- DESCRIPTION -->
+  <div class="deal-text">
+    XP-Booster
+  </div>
+
+  <!-- BUTTON -->
+  <button class="deal-btn"
+    onclick="window.open('https://crownslotslink.com/h70a5rwfg','_blank')">
+
+    ZUM CASINO
+
+  </button>
+
+</div>
+
+<div class="deal-card">
+
+  <!-- TOP: Logo + Badge -->
+  <div class="deal-top">
+
+    <!-- LOGO (hier nur Domain einsetzen) -->
+    <img class="deal-logo"
+      src="https://www.google.com/s2/favicons?domain=7bitcasino.com&sz=64">
+
+    <!-- BADGE -->
+    <div class="deal-badge">KRYPTO</div>
+
+  </div>
+
+  <!-- TITLE -->
+  <div class="deal-title">
+   7️⃣ 7BitCasino
+  </div>
+
+  <!-- DESCRIPTION -->
+  <div class="deal-text">
+    XP-Booster-Krypto Casino
+  </div>
+
+  <!-- BUTTON -->
+  <button class="deal-btn"
+    onclick="window.open('https://7bit.partners/pmprj8i5n')">
+
+    JETZT TESTEN
+
+  </button>
+
+</div>
+
+<div class="deal-card">
+
+  <!-- TOP: Logo + Badge -->
+  <div class="deal-top">
+
+    <!-- LOGO (hier nur Domain einsetzen) -->
+    <img class="deal-logo"
+      src="https://www.google.com/s2/favicons?domain=miraxcasino.com&sz=64">
+
+    <!-- BADGE -->
+    <div class="deal-badge">XP-Boost</div>
+
+  </div>
+
+  <!-- TITLE -->
+  <div class="deal-title">
+   🪄 Mirax Casino
+  </div>
+
+  <!-- DESCRIPTION -->
+  <div class="deal-text">
+    XP-Booster
+  </div>
+
+  <!-- BUTTON -->
+  <button class="deal-btn"
+    onclick="window.open('https://mirax.partners/pdxnhal92')">
+
+    JETZT STARTEN
+
+  </button>
+
+</div>
+
+<div class="deal-card">
+
+  <!-- TOP: Logo + Badge -->
+  <div class="deal-top">
+
+    <!-- LOGO (hier nur Domain einsetzen) -->
+    <img class="deal-logo"
+      src="https://www.google.com/s2/favicons?domain=gbgo.net&sz=64">
+
+    <!-- BADGE -->
+    <div class="deal-badge">100 FREISPIELE</div>
+
+  </div>
+
+  <!-- TITLE -->
+  <div class="deal-title">
+  🎁 100 Freispiele
+  </div>
+
+  <!-- DESCRIPTION -->
+  <div class="deal-text">
+    100 No Deposit Freispiele
+  </div>
+
+  <!-- BUTTON -->
+  <button class="deal-btn"
+    onclick="window.open('https://gbgo.net/r/XJTWVH25')">
+
+    FREISPIELE HOLEN
+
+  </button>
+
+</div>
+
+<div class="deal-card">
+
+  <!-- TOP: Logo + Badge -->
+  <div class="deal-top">
+
+    <!-- LOGO (hier nur Domain einsetzen) -->
+    <img class="deal-logo"
+      src="https://www.google.com/s2/favicons?domain=tg.casino&sz=64">
+
+    <!-- BADGE -->
+    <div class="deal-badge">NO KYC</div>
+
+  </div>
+
+  <!-- TITLE -->
+  <div class="deal-title">
+ 💰 TGC
+  </div>
+
+  <!-- DESCRIPTION -->
+  <div class="deal-text">
+    Krypto Casino ohne KYC
+  </div>
+
+  <!-- BUTTON -->
+  <button class="deal-btn"
+    onclick="window.open('https://t.me/tgcplaybot/?start=UsHEI0AGB')">
+
+    JETZT STARTEN
+
+  </button>
+
+</div>
+
+</div>
+
+
+
+<!-- PROFILE -->
+<div id="profile" class="page">
+<h2>👤Social Hub</h2>
+
+<div class="card">
+Telegram ID:
+<b id="userid">Lädt...</b>
+</div>
+
+<div class="card">
+App Mode:
+<b id="mode">...</b>
+</div>
+
+<div class="card">
+<h3>🏅 Dein Rang</h3>
+<img id="rankimg" style="width:100%;border-radius:14px;margin-top:10px;">
+<div id="rankname" style="margin-top:10px;font-weight:bold;"></div>
+</div>
+
+<div class="card">
+<h3>🎯 Dein Invite Link</h3>
+<input id="reflink" readonly style="width:100%;padding:10px;border-radius:8px;border:none;">
+<button onclick="copyLink()">Copy Link</button>
+</div>
+
+<div class="card">
+<h3>👥 Invites</h3>
+<div>Count: <b id="invitecount">0</b></div>
+<div id="invitelist" style="margin-top:10px;opacity:0.8;"></div>
+</div>
+
+<!-- LEADERBOARD -->
+<div class="card">
+<h3>🏆 Leaderboard</h3>
+
+<div id="leaderboard">
+Lädt...
+</div>
+
+<div style="margin-top:15px;">
+<b>📍 Deine Platzierung</b>
+<div id="myrank" style="margin-top:8px;opacity:0.9;">
+Lädt...
+</div>
+</div>
+</div>
+
+</div>
+
+<!-- NAV -->
+<div class="navbar">
+<button class="navbtn" onclick="show('home')">Home</button>
+<button class="navbtn" onclick="show('deals')">Deals</button>
+<button class="navbtn" onclick="show('profile')">Profil</button>
+</div>
+
+<script>
+
+let cachedUsers = [];
+let spinLocked = false;
+function show(p){
+document.querySelectorAll('.page').forEach(e=>e.classList.remove('active'));
+document.getElementById(p).classList.add('active');
+
+document.querySelectorAll('.navbtn').forEach(b=>b.classList.remove('active'));
+document.querySelector(`[onclick="show('${p}')"]`)?.classList.add('active');
+
+// 👉 WM CONTENT LADEN WENN WM GEÖFFNET WIRD
+if(p === "wm"){
+  loadWmMatches();
+  loadWmLeaderboard();
+  loadSpecialTips();
+}
+}
+
+/* TELEGRAM */
+const tg = window.Telegram?.WebApp;
+
+if(tg){
+tg.ready();
+tg.expand();
+document.getElementById("mode").innerText = "Telegram WebApp";
+}else{
+document.getElementById("mode").innerText = "Browser Mode";
+}
+
+/* USER */
+let telegramUser = null;
+
+if (tg?.initDataUnsafe?.user?.id) {
+  telegramUser = String(tg.initDataUnsafe.user.id);
+} else {
+  telegramUser = "123456";
+}
+
+console.log("telegramUser:", telegramUser);
+
+document.getElementById("userid").innerText = telegramUser;
+
+/* LEVEL SYSTEM */
+const levelData = {
+1: { name: "🪙 Bettler-Ritter", img: "https://i.imgur.com/yMrBEJd.jpeg" },
+2: { name: "🛡️ Schank-Ritter", img: "https://i.imgur.com/b5lIgct.jpeg" },
+3: { name: "⚔️ Eisen-Ritter", img: "https://i.imgur.com/JAN04M7.jpeg" },
+4: { name: "🐎 Turnier-Ritter", img: "https://i.imgur.com/ai8mbZ9.jpeg" },
+5: { name: "🏰 Burg-Ritter", img: "https://i.imgur.com/P3QfqMt.jpeg" },
+6: { name: "👑 Casino-Champion", img: "https://i.imgur.com/CpxXk0u.jpeg" },
+7: { name: "💎 Royal High Roller", img: "https://i.imgur.com/eyE6o4A.jpeg" },
+8: { name: "🔥 Shadow Knight", img: "https://i.imgur.com/LL6GdJZ.jpeg" },
+9: { name: "⚡ Mythic Dealer", img: "https://i.imgur.com/6QK4CYO.jpeg" },
+10:{ name: "🏆 Legend of the Casino", img: "https://i.imgur.com/kQda60g.jpeg" },
+
+11:{ name: "☠️ Dark Emperor", img: "https://i.imgur.com/kQda60g.jpeg" },
+12:{ name: "🩸 Blood King", img: "https://i.imgur.com/kQda60g.jpeg" },
+13:{ name: "🌌 Cosmic Gambler", img: "https://i.imgur.com/kQda60g.jpeg" },
+14:{ name: "🔥 Inferno Master", img: "https://i.imgur.com/kQda60g.jpeg" },
+15:{ name: "👁️ Eternal Overlord", img: "https://i.imgur.com/kQda60g.jpeg" },
+16:{ name: "⚜️ Divine Champion", img: "https://i.imgur.com/kQda60g.jpeg" },
+17:{ name: "💀 Nightmare Dealer", img: "https://i.imgur.com/kQda60g.jpeg" },
+18:{ name: "🌠 Galactic Emperor", img: "https://i.imgur.com/kQda60g.jpeg" },
+19:{ name: "🧊 Frozen Tyrant", img: "https://i.imgur.com/kQda60g.jpeg" },
+20:{ name: "🐉 Dragon Lord", img: "https://i.imgur.com/kQda60g.jpeg" }
+};
+
+/* SUPABASE */
+const SUPABASE_URL = "https://yngesshzkwartkfoynrx.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InluZ2Vzc2h6a3dhcnRrZm95bnJ4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTMzNzA2NCwiZXhwIjoyMDk2OTEzMDY0fQ.Iy12AjLqfjoxRT9aV7EWASxma3IxZbHqcJLIJPzKAMY";
+
+const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function loadUser(){
+
+try{
+
+const { data, error } = await client
+.from("users")
+.select("*")
+.eq("user_id", String(telegramUser));
+
+if(error){
+document.getElementById("xp").innerText =
+"DB ERROR";
+return;
+}
+
+if(!data || data.length === 0){
+
+const { error: insertError } = await client
+.from("users")
+.insert({
+user_id: String(telegramUser),
+xp: 0,
+level: 1,
+invites: 0
+});
+
+if(insertError){
+document.getElementById("xp").innerText =
+"INSERT ERROR";
+return;
+}
+
+return loadUser();
+}
+
+const user = data[0];
+
+const xp = user.xp || 0;
+const level = user.level || 1;
+
+document.getElementById("xp").innerText = xp;
+document.getElementById("level").innerText = level;
+
+const current = (level - 1) * 100;
+const next = level * 100;
+
+let progress = ((xp - current) / (next - current)) * 100;
+progress = Math.max(0, Math.min(progress, 100));
+
+document.getElementById("xpfill").style.width = progress + "%";
+
+document.getElementById("nextlevel").innerText =
+`${next - xp} XP bis Level ${level + 1}`;
+
+document.getElementById("rankname").innerText =
+levelData[level]?.name || "👑 Max Level Ritter";
+
+document.getElementById("rankimg").src =
+levelData[level]?.img || levelData[20].img;
+
+document.getElementById("invitecount").innerText =
+user.invites || 0;
+
+document.getElementById("reflink").value =
+"https://t.me/RoyalCasinoHubBot?start=" + (user.ref_code || "");
+
+let list = user.invite_list;
+
+if(!list){
+
+document.getElementById("invitelist").innerHTML =
+"Noch keine Invites";
+
+}else{
+
+if(typeof list === "string"){
+try{
+list = JSON.parse(list);
+}catch(e){
+list = [];
+}
+}
+
+if(Array.isArray(list) && list.length > 0){
+
+document.getElementById("invitelist").innerHTML =
+list.map(i =>
+`👤 ${i.username || i.id}<br><small>📅 ${i.date || ""}</small>`
+).join("<br><br>");
+
+}else{
+
+document.getElementById("invitelist").innerHTML =
+"Noch keine Invites";
+
+}
+
+}
+
+}catch(err){
+
+console.log(err);
+
+}
+
+}
+
+/* DAILY SYSTEM */
+async function loadDaily(){
+const { data } = await client
+.from("users")
+.select("daily_last_claim, daily_streak")
+.eq("user_id", String(telegramUser))
+
+if(!data || !data.length) return;
+
+const u = data[0];
+const last = u.daily_last_claim ? new Date(u.daily_last_claim) : null;
+const now = new Date();
+
+const streak = u.daily_streak || 0;
+
+document.getElementById("streak").innerText = streak;
+
+const btn = document.getElementById("dailyBtn");
+
+if(last){
+const diff = now - last;
+const hours = diff / (1000*60*60);
+
+if(hours < 24){
+const left = 24 - hours;
+btn.disabled = true;
+startCountdown(left);
+return;
+}
+}
+
+btn.disabled = false;
+document.getElementById("cooldown").innerText = "Bereit zum Abholen";
+}
+
+function startCountdown(hours){
+let seconds = Math.floor(hours * 3600);
+
+const el = document.getElementById("cooldown");
+
+const i = setInterval(()=>{
+seconds--;
+const h = Math.floor(seconds/3600);
+const m = Math.floor((seconds%3600)/60);
+const s = seconds%60;
+
+el.innerText = `Cooldown: ${h}h ${m}m ${s}s`;
+
+if(seconds <= 0){
+clearInterval(i);
+loadDaily();
+}
+},1000);
+}
+
+async function claimDaily(){
+  const btn = document.getElementById("dailyBtn");
+  btn.disabled = true;
+
+  try {
+    const { data, error } = await client
+      .from("users")
+      .select("daily_streak, daily_last_claim, xp")
+      .eq("user_id", String(telegramUser))
+      .single();
+
+    if (error || !data) {
+      console.log(error);
+      btn.disabled = false;
+      return;
+    }
+
+    const now = new Date();
+    const last = data.daily_last_claim ? new Date(data.daily_last_claim) : null;
+
+    if (last && (now - last) < 86400000) {
+      document.getElementById("cooldown").innerText = "⏳ Schon abgeholt";
+      btn.disabled = true;
+      return;
+    }
+
+    let streak = (data.daily_streak || 0) + 1;
+    if (streak > 7) streak = 1;
+
+    const bonus = streak;
+
+    await client
+      .from("users")
+      .update({
+        daily_streak: streak,
+        daily_last_claim: now.toISOString(),
+        xp: (data.xp || 0) + bonus
+      })
+      .eq("user_id", String(telegramUser));
+
+    await loadUser();
+    await loadDaily();
+
+  } catch (e) {
+    console.log(e);
+    btn.disabled = false;
+  }
+}
+
+/* LEADERBOARD */
+async function loadLeaderboard(){
+
+try{
+
+const { data } = await client
+.from("users")
+.select("user_id, xp, level")
+.order("xp", { ascending:false })
+.limit(5);
+
+if(data && data.length > 0){
+
+let html = "";
+
+data.forEach((u,index)=>{
+
+const hidden =
+String(u.user_id).substring(0,2) + "****";
+
+html += `
+<div style="margin-bottom:12px;">
+<b>#${index+1}</b> • ${hidden}<br>
+⭐ Level ${u.level || 1} • XP ${u.xp || 0}
+</div>
+`;
+});
+
+document.getElementById("leaderboard").innerHTML = html;
+}
+
+const { data: allUsers } = await client
+.from("users")
+.select("user_id, xp, level")
+.order("xp", { ascending:false });
+
+if(allUsers){
+
+const myIndex = allUsers.findIndex(u => String(u.user_id) === String(telegramUser));
+
+if(myIndex >= 0){
+
+const me = allUsers[myIndex];
+
+document.getElementById("myrank").innerHTML = `
+🏅 Platz #${myIndex+1}<br>
+⭐ Level ${me.level || 1} • XP ${me.xp || 0}
+`;
+}
+
+}
+
+}catch(err){ console.log(err); }
+
+}
+
+loadUser();
+loadLeaderboard();
+loadDaily();
+
+/* COPY */
+function copyLink(){
+const el = document.getElementById("reflink");
+el.select();
+document.execCommand("copy");
+alert("Link kopiert!");
+}
+const slotSymbols = [
+  "🍒","🍋","🍊","🍉",
+  "⭐","💎","🔔","7️⃣",
+  "👑","⚡","🔥"
+];
+async function spinSlot(){
+const { data: u, error } = await client
+  .from("users")
+  .select("*")
+  .eq("user_id", String(telegramUser))
+  .maybeSingle();
+
+if (!u) {
+  resultEl.innerText = "User fehlt → wird erstellt...";
+
+  await client.from("users").insert({
+  user_id: String(telegramUser),
+    xp: 0,
+    level: 1,
+    slot_last_spin: null
+  });
+
+  return;
+}
+const btn = document.getElementById("spinBtn");
+const display = document.getElementById("slotDisplay");
+const resultEl = document.getElementById("slotResult");
+
+btn.disabled = true;
+spinLocked = true;
+
+try {
+
+  const { data: u, error } = await client
+  .from("users")
+  .select("slot_last_spin, xp")
+  .eq("user_id", String(telegramUser))
+  .maybeSingle();
+
+if (error) {
+  console.log("DB ERROR:", error);
+  resultEl.innerText = "DB Fehler";
+  spinLocked = false;
+  btn.disabled = false;
+  return;
+}
+
+if (!u) {
+  resultEl.innerText = "User nicht gefunden";
+  spinLocked = false;
+  btn.disabled = false;
+  return;
+}
+
+  const now = new Date();
+  const last = u.slot_last_spin ? new Date(u.slot_last_spin) : null;
+
+  if(last && (now - last) < 86400000){
+  const hoursLeft = Math.ceil((86400000 - (now - last)) / 3600000);
+  resultEl.innerText = `⏳ Warte noch ${hoursLeft}h`;
+
+  btn.disabled = true;
+  spinLocked = false; // nur hier freigeben
+  return;
+}
+
+  resultEl.innerText = "Spinning... 🎰";
+  display.classList.add("slot-rolling");
+
+  let counter = 0;
+
+  const interval = setInterval(() => {
+
+    display.innerText =
+      `${slotSymbols[Math.floor(Math.random()*slotSymbols.length)]} ` +
+      `${slotSymbols[Math.floor(Math.random()*slotSymbols.length)]} ` +
+      `${slotSymbols[Math.floor(Math.random()*slotSymbols.length)]}`;
+
+    counter++;
+
+    if(counter > 32){
+      clearInterval(interval);
+      display.classList.remove("slot-rolling");
+
+      const final = [
+        slotSymbols[Math.floor(Math.random()*slotSymbols.length)],
+        slotSymbols[Math.floor(Math.random()*slotSymbols.length)],
+        slotSymbols[Math.floor(Math.random()*slotSymbols.length)]
+      ];
+
+      display.innerText = final.join(" ");
+
+      let xpGain = 0;
+      let msg = "❌ Nichts gewonnen";
+
+      if(final[0] === final[1] && final[1] === final[2]){
+        xpGain = 10;
+        msg = "🔥 JACKPOT +10 XP";
+      }
+
+      resultEl.innerText = msg;
+
+      client
+        .from("users")
+        .update({
+          xp: (u?.xp || 0) + xpGain,
+          slot_last_spin: now.toISOString()
+        })
+        .eq("user_id", String(telegramUser))
+        .then(() => loadUser());
+
+      setTimeout(() => {
+  btn.disabled = false;
+  spinLocked = false;
+}, 1500);
+    }
+
+  }, 85);
+
+} catch(err){
+  console.log(err);
+  resultEl.innerText = "Fehler";
+
+  btn.disabled = false;
+  spinLocked = false;
+}
+
+}
+
+async function startQueue(){
+
+const status = document.getElementById("pvpStatus");
+status.innerText = "🔎 Suche Gegner...";
+
+try{
+
+const { data: existing } = await client
+  .from("game_queue")
+  .select("*")
+  .eq("user_id", String(telegramUser))
+  .eq("status", "waiting");
+
+const q = existing?.[0];
+
+// 👉 WENN NICHT IN QUEUE → EINTRAGEN
+if(!q){
+
+  const { error } = await client
+    .from("game_queue")
+    .insert({
+      user_id: String(telegramUser),
+      status: "waiting"
+    });
+
+  if(error){
+    console.log(error);
+    status.innerText = "❌ Fehler beim Start";
+    return;
+  }
+
+  status.innerText = "✅ Wartet auf Gegner...";
+  return;
+}
+
+// 👉 wenn schon drin → Timeout prüfen
+const now = new Date();
+const created = new Date(q.created_at);
+
+const diff = (now - created) / 1000;
+
+if(diff > 60){
+
+  await client
+    .from("game_queue")
+    .delete()
+    .eq("id", q.id);
+
+  status.innerText = "⏱️ Suche abgebrochen (Timeout)";
+  return;
+}
+
+}catch(err){
+console.log(err);
+status.innerText = "❌ Fehler";
+}
+
+}
+
+async function checkMatch(){
+
+try{
+
+const { data } = await client
+.from("game_matches")
+.select("*")
+.or(`player1.eq.${String(telegramUser)},player2.eq.${String(telegramUser)}`)
+.eq("status", "active")
+.limit(1);
+
+if(!data || data.length === 0){
+return;
+}
+
+const match = data[0];
+
+window.currentMatch = match;
+
+let opponent = match.player1 == String(telegramUser)
+? match.player2
+: match.player1;
+
+document.getElementById("pvpStatus").innerText =
+"⚔️ Gegner gefunden: " + opponent;
+
+// Würfelbutton aktivieren
+document.getElementById("rollBtn").disabled = false;
+
+}catch(err){
+console.log(err);
+}
+
+}
+setInterval(checkMatch, 2000);
+
+async function rollDice(){
+
+const btn = document.getElementById("rollBtn");
+const result = document.getElementById("diceResult");
+
+if(!window.currentMatch){
+result.innerText = "Kein Match gefunden";
+return;
+}
+
+btn.disabled = true;
+
+const roll = Math.floor(Math.random() * 100) + 1;
+
+result.innerText = "🎲 Du hast gewürfelt: " + roll;
+
+const match = window.currentMatch;
+
+let update = {};
+
+if(match.player1 === String(telegramUser)){
+update.p1_roll = roll;
+}else{
+update.p2_roll = roll;
+}
+
+await client
+.from("game_matches")
+.update(update)
+.eq("id", match.id);
+
+await tryFinish(match.id);
+
+
+result.innerText += "\n⏳ Warte auf Gegner...";
+
+
+// ⭐⭐⭐ DAS IST DER WICHTIGE FIX
+await finishMatch();
+
+}
+
+async function checkFinish(){
+
+try{
+
+if(!window.currentMatch) return;
+
+const { data: m } = await client
+.from("game_matches")
+.select("*")
+.eq("id", window.currentMatch.id)
+.single();
+
+if(!m) return;
+
+const now = new Date();
+const created = new Date(m.created_at);
+const diff = (now - created) / 1000; // Sekunden
+
+// ⛔ Match zu alt + nicht fertig
+if(diff > 120 && (m.p1_roll == null || m.p2_roll == null)) {
+
+  await client
+    .from("game_matches")
+    .update({
+      status: "cancelled"
+    })
+    .eq("id", m.id);
+
+  document.getElementById("diceResult").innerText =
+    "⏱️ Match abgebrochen – Gegner hat nicht gewürfelt";
+
+  window.currentMatch = null;
+
+  return;
+}
+
+// ❗ noch nicht fertig → nichts tun
+if(m.status !== "finished") return;
+
+await loadMatchUsers(m);
+showResult(m);
+
+}catch(err){
+console.log("FINISH ERROR:", err);
+}
+
+}
+
+async function loadMatchUsers(m){
+
+const { data } = await client
+  .from("users")
+  .select("id, first_name, username")
+  .in("id", [m.player1, m.player2]);
+
+cachedUsers = data || [];
+
+}
+
+async function tryFinish(matchId){
+
+const { data: m } = await client
+.from("game_matches")
+.select("*")
+.eq("id", matchId)
+.single();
+
+if(!m) return;
+
+// nur 1x erlauben
+if(m.status === "finished" || m.status === "finishing") return;
+
+if(m.p1_roll == null || m.p2_roll == null) return;
+
+// LOCK setzen (wichtig!)
+await client
+.from("game_matches")
+.update({
+status: "finishing"
+})
+.eq("id", m.id);
+
+let winner = null;
+
+if(m.p1_roll > m.p2_roll){
+winner = m.player1;
+}
+else if(m.p2_roll > m.p1_roll){
+winner = m.player2;
+}
+else{
+winner = "draw";
+}
+
+// FINAL UPDATE
+await client
+.from("game_matches")
+.update({
+winner,
+status: "finished",
+match_finished: true
+})
+.eq("id", m.id);
+
+// XP nur hier!
+if(winner !== "draw"){
+
+const { data: user } = await client
+.from("users")
+.select("xp")
+.eq("user_id", winner)
+.single();
+
+await client
+.from("users")
+.update({
+xp: (user.xp || 0) + 2
+})
+.eq("user_id", winner);
+}
+
+}
+
+setInterval(checkFinish, 2000);
+
+function showResult(m){
+
+let yourRoll = 0;
+let enemyRoll = 0;
+
+if(String(telegramUser) === String(m.player1)){
+  yourRoll = m.p1_roll;
+  enemyRoll = m.p2_roll;
+}else{
+  yourRoll = m.p2_roll;
+  enemyRoll = m.p1_roll;
+}
+
+let enemyId =
+  String(telegramUser) === String(m.player1)
+    ? m.player2
+    : m.player1;
+
+let yourName = getName(telegramUser);
+let enemyName = getName(enemyId);
+
+let resultText = `
+🎲 Du: ${yourRoll}
+🎲 Gegner: ${enemyRoll}
+
+👤 Du: ${yourName}
+👤 Gegner: ${enemyName}
+`;
+
+if(m.winner === "draw"){
+  resultText += "\n🤝 Unentschieden!";
+}
+else if(String(telegramUser) === String(m.winner)){
+  resultText += "\n🏆 Du hast gewonnen!";
+  resultText += "\n⭐ +2 XP";
+}
+else{
+  resultText += "\n😅 Du hast verloren!";
+}
+
+document.getElementById("diceResult").innerText = resultText;
+
+}
+
+function getName(id){
+
+const u = cachedUsers.find(x => String(x.id) === String(id));
+
+if(!u) return id;
+
+return u.username
+  ? "@" + u.username
+  : u.first_name || id;
+
+}
+
+async function answerDaily(answer){
+
+const btns = document.querySelectorAll("#wm button");
+btns.forEach(b => b.disabled = true);
+
+const result = document.getElementById("dailyResult");
+
+try {
+
+const { error } = await client
+  .from("wm_daily_answers")
+  .insert({
+    user_id: String(telegramUser),
+    answer: answer
+  });
+
+if(error){
+
+  if(error.code === "23505"){
+    result.innerText = "⛔ Du hast heute schon geantwortet";
+  } else {
+    result.innerText = "❌ Fehler beim Speichern";
+    console.log(error);
+  }
+
+  return;
+}
+
+if(answer === "20"){
+await addWmPoints(telegramUser, 1);
+result.innerText = "✅ Richtig! +1 Punkt";
+}else{
+result.innerText = "❌ Falsch!";
+}
+
+} catch(err){
+console.log(err);
+result.innerText = "❌ Fehler";
+}
+
+setTimeout(() => {
+  btns.forEach(b => b.disabled = false);
+}, 1500);
+
+}
+
+async function addWmPoints(userId, points){
+
+const { data } = await client
+.from("wm_points")
+.select("*")
+.eq("user_id", String(userId))
+.single();
+
+if(!data){
+
+await client
+.from("wm_points")
+.insert({
+user_id: String(userId),
+points: points
+});
+
+} else {
+
+await client
+.from("wm_points")
+.update({
+points: (data.points || 0) + points
+})
+.eq("user_id", String(userId));
+
+}
+
+}
+
+
+
+async function loadWmMatches(){
+
+  const container = document.getElementById("wmMatches");
+
+  try {
+
+    // 1. 🔥 HIER KOMMT DEIN TIPP-LOAD REIN
+    const { data: myTips } = await client
+      .from("wm_tips")
+      .select("*")
+      .eq("user_id", String(telegramUser));
+
+    function getTip(matchId){
+      return myTips?.find(t => String(t.match_id) === String(matchId));
+    }
+
+    // 2. MATCHES LADEN
+    const { data } = await client
+      .from("wm_matches")
+      .select("*")
+      .gte("start_time", new Date().toISOString())
+      .order("start_time", { ascending: true });
+
+    if(!data || data.length === 0){
+      container.innerHTML = "Keine Spiele vorhanden";
+      return;
+    }
+
+    let html = "";
+
+    // 3. 🔥 HIER IST DER WICHTIGE FIX IM LOOP
+    data.forEach(match => {
+
+      const tip = getTip(match.id); // 👈 DAS IST DER FEHLENDE PART
+
+      html += `
+        <div style="margin-bottom:18px;padding:12px;border-radius:12px;background:rgba(255,255,255,0.4);">
+
+          <div style="font-size:12px;opacity:0.7;">
+            ${match.stage || "Spiel"}
+          </div>
+
+          <div style="font-weight:900;">
+          ${match.home_flag || ""} ${match.home_team || "Home"}
+          vs
+          ${match.away_flag || ""} ${match.away_team || "Away"}
+        </div>
+
+        <div style="
+          margin-top:4px;
+          font-size:12px;
+          opacity:0.8;
+        ">
+          📅 ${new Date(match.start_time).toLocaleDateString("de-DE")}
+          •
+          🕒 ${new Date(match.start_time).toLocaleTimeString("de-DE", {
+            hour: "2-digit",
+            minute: "2-digit"
+          })}
+</div>
+          ${match.home_score != null && match.away_score != null ? `
+          <div style="
+            margin-top:6px;
+            font-weight:700;
+            color:#ff6b2c;
+          ">
+            Ergebnis: ${match.home_score} : ${match.away_score}
+          </div>
+`         : ""}
+          <div style="display:flex;gap:10px;margin:10px 0;">
+            <input id="home_${match.id}" type="number" placeholder="0" style="flex:1;"
+              value="${tip?.home_tip || ""}">
+
+            <input id="away_${match.id}" type="number" placeholder="0" style="flex:1;"
+              value="${tip?.away_tip || ""}">
+          </div>
+
+          <button onclick="saveTip(${match.id})">
+            Tipp speichern
+          </button>
+
+          ${tip ? `
+            <div style="margin-top:10px;font-weight:600;opacity:0.85;">
+              🎯 Dein Tipp: ${tip.home_tip} : ${tip.away_tip}
+            </div>
+          ` : ""}
+
+        </div>
+      `;
+
+    });
+
+    container.innerHTML = html;
+
+  } catch(err){
+    console.log(err);
+    container.innerHTML = "Fehler beim Laden";
+  }
+}
+
+async function loadSpecialTips(){
+
+const { data } = await client
+.from("wm_special_tips")
+.select("*")
+.eq("user_id", String(telegramUser))
+.single();
+
+if(!data) return;
+
+document.getElementById("mySpecialTips").innerHTML = `
+<b>🏆 Deine Sondertipps</b><br><br>
+
+🏆 Weltmeister: ${data.world_champion || "-"}<br>
+🇩🇪 Deutschland: ${data.germany_result || "-"}<br>
+⚽ Torschützenkönig: ${data.top_scorer || "-"}
+`;
+
+}
+
+async function saveTip(matchId){
+
+const home = document.getElementById("home_" + matchId).value;
+const away = document.getElementById("away_" + matchId).value;
+
+if(home === "" || away === ""){
+alert("Bitte Tipp eingeben");
+return;
+}
+const { data: match } = await client
+.from("wm_matches")
+.select("*")
+.eq("id", matchId)
+.single();
+
+if(match && new Date(match.start_time) <= new Date()){
+alert("Dieses Spiel hat bereits begonnen");
+return;
+}
+
+// check ob schon getippt
+const { data } = await client
+.from("wm_tips")
+.select("*")
+.eq("user_id", String(telegramUser))
+.eq("match_id", matchId);
+
+if(data && data.length > 0){
+alert("Du hast dieses Spiel schon getippt");
+return;
+}
+
+// speichern
+await client
+.from("wm_tips")
+.insert({
+user_id: String(telegramUser),
+match_id: matchId,
+home_tip: parseInt(home),
+away_tip: parseInt(away),
+points: 0
+});
+
+alert("Tipp gespeichert!");
+
+await loadWmMatches();
+await loadWmLeaderboard();
+}
+async function calculateMatchPoints(matchId){
+
+  const { data: match } = await client
+    .from("wm_matches")
+    .select("*")
+    .eq("id", matchId)
+    .single();
+
+  if(!match || match.home_score == null || match.away_score == null) return;
+
+  // ❌ schon berechnet → raus
+  if(match.points_calculated) return;
+
+  const { data: tips } = await client
+    .from("wm_tips")
+    .select("*")
+    .eq("match_id", matchId);
+
+  if(!tips) return;
+
+  const realDiff = match.home_score - match.away_score;
+
+  for(const tip of tips){
+
+    let points = 0;
+    const tipDiff = tip.home_tip - tip.away_tip;
+
+    if(tip.home_tip === match.home_score && tip.away_tip === match.away_score){
+      points = 3;
+    }
+    else if(
+      (realDiff > 0 && tipDiff > 0) ||
+      (realDiff < 0 && tipDiff < 0) ||
+      (realDiff === 0 && tipDiff === 0)
+    ){
+      points = 1;
+    }
+
+    await addWmPoints(tip.user_id, points);
+  }
+
+  // ✅ markieren als fertig
+  await client
+    .from("wm_matches")
+    .update({ points_calculated: true })
+    .eq("id", matchId);
+}
+
+async function setMatchResult(matchId, homeScore, awayScore) {
+
+  await client
+    .from("wm_matches")
+    .update({
+      home_score: homeScore,
+      away_score: awayScore
+    })
+    .eq("id", matchId);
+
+  await calculateMatchPoints(matchId); // 👈 HIER hin
+}
+
+async function loadWmLeaderboard(){
+
+  try {
+
+    const { data } = await client
+      .from("wm_points")
+      .select("user_id, points")
+      .order("points", { ascending:false })
+      .limit(10);
+
+    const container = document.getElementById("wmLeaderboard");
+
+    if(!data || data.length === 0){
+      container.innerHTML = "Noch keine Punkte";
+      return;
+    }
+
+    let html = "";
+
+    data.forEach((u, i) => {
+
+      const hiddenId = String(u.user_id).slice(0,3) + "****";
+
+      html += `
+        <div style="margin-bottom:10px;">
+          <b>#${i+1}</b> • ${hiddenId}<br>
+          ⭐ ${u.points || 0} Punkte
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+
+    // 👉 eigene Platzierung
+    const all = await client
+      .from("wm_points")
+      .select("user_id, points")
+      .order("points", { ascending:false });
+
+    if(all.data){
+
+      const myIndex = all.data.findIndex(
+        u => String(u.user_id) === String(telegramUser)
+      );
+
+      if(myIndex >= 0){
+
+        const me = all.data[myIndex];
+
+        document.getElementById("myWmRank").innerHTML = `
+          🏅 Platz #${myIndex+1}<br>
+          ⭐ ${me.points || 0} Punkte
+        `;
+      }
+    }
+
+  } catch(err){
+    console.log(err);
+  }
+}
+
+async function saveSpecialTips(){
+
+const result = document.getElementById("specialTipsResult");
+
+const { data } = await client
+.from("wm_special_tips")
+.select("*")
+.eq("user_id", String(telegramUser));
+
+if(data && data.length > 0){
+result.innerHTML = "⛔ Bereits abgegeben";
+return;
+}
+
+let topScorer = document.getElementById("topScorer").value;
+
+if(topScorer === "Anderer Spieler"){
+topScorer = document.getElementById("otherTopScorer").value;
+}
+
+await client
+.from("wm_special_tips")
+.insert({
+
+user_id: String(telegramUser),
+
+world_champion:
+document.getElementById("worldChampion").value,
+
+germany_result:
+document.getElementById("germanyResult").value,
+
+top_scorer: topScorer
+
+});
+
+result.innerHTML = "✅ Sondertipps gespeichert";
+
+await loadSpecialTips();
+
+}
+
+document.getElementById("topScorer").addEventListener("change", function(){
+
+const field = document.getElementById("otherTopScorer");
+
+if(this.value === "Anderer Spieler"){
+field.style.display = "block";
+}else{
+field.style.display = "none";
+}
+
+});
+setInterval(async () => {
+
+  const { data } = await client
+    .from("wm_matches")
+    .select("*")
+    .eq("points_calculated", false);
+
+  if(!data) return;
+
+  for(const match of data){
+
+    if(match.home_score != null && match.away_score != null){
+      await calculateMatchPoints(match.id);
+    }
+
+  }
+
+}, 10000);
+
+</script>
+
+</body>
+</html>
