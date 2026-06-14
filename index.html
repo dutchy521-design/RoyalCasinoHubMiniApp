@@ -1774,6 +1774,12 @@ loadDaily();
 /* COPY */
 function copyLink(){
 
+const el = document.getElementById("reflink");
+el.select();
+document.execCommand("copy");
+alert("Link kopiert!");
+}
+
 async function openAvatarPicker(){
 
 let choice = prompt(
@@ -1813,11 +1819,7 @@ loadUser();
 
 }	
 
-const el = document.getElementById("reflink");
-el.select();
-document.execCommand("copy");
-alert("Link kopiert!");
-}
+
 const slotSymbols = [
 "👑",
 "💎",
