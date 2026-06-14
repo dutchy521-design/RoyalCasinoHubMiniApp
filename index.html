@@ -1656,7 +1656,7 @@ try{
 
 const { data } = await client
 .from("users")
-.select("id, xp, level")
+.select("id, first_name, xp, level")
 .order("xp", { ascending:false })
 .limit(5);
 
@@ -1667,12 +1667,33 @@ let html = "";
 data.forEach((u,index)=>{
 
 const hidden =
-String(u.id).substring(0,2) + "****";
+u.first_name
+? u.first_name.substring(0,2) + "***"
+: "Spieler";
+
+let medal = "🏅";
+
+if(index === 0) medal = "🥇";
+if(index === 1) medal = "🥈";
+if(index === 2) medal = "🥉";
 
 html += `
-<div style="margin-bottom:12px;">
-<b>#${index+1}</b> • ${hidden}<br>
-⭐ Level ${u.level || 1} • XP ${u.xp || 0}
+<div style="
+margin-bottom:14px;
+padding:12px;
+border-radius:14px;
+background:rgba(255,255,255,0.05);
+">
+
+<b>${medal} Platz ${index+1}</b><br>
+👤 ${hidden}<br>
+
+⭐ Level ${u.level || 1}
+
+<br>
+
+💎 ${u.xp || 0} XP
+
 </div>
 `;
 });
@@ -1682,7 +1703,7 @@ document.getElementById("leaderboard").innerHTML = html;
 
 const { data: allUsers } = await client
 .from("users")
-.select("id, xp, level")
+.select("id, first_name, xp, level")
 .order("xp", { ascending:false });
 
 if(allUsers){
