@@ -1826,7 +1826,7 @@ const slotSymbols = [
 "💰",
 "🎰"
 ];
-async function spinSlot(){
+window.spinSlot = async function(){
 const { data: u, error } = await client
   .from("users")
   .select("*")
@@ -2351,7 +2351,7 @@ async function setMatchResult(matchId, homeScore, awayScore) {
   await calculateMatchPoints(matchId); // 👈 HIER hin
 }
 
-async function loadWmLeaderboard(){
+window.loadWmLeaderboard = async function(){
 
   try {
 
@@ -2484,7 +2484,7 @@ setInterval(async () => {
 
 }, 10000);
 
-async function loadPastMatches(){
+window.loadPastMatches = async function(){
 
   const container = document.getElementById("pastMatches");
 
