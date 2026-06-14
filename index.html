@@ -1999,7 +1999,7 @@ async function loadWmMatches(){
     const { data: myTips } = await client
       .from("wm_tips")
       .select("*")
-      .eq("user_id", String(telegramUser))
+      .eq("user_id", String(telegramUser));
     function getTip(matchId){
       return myTips?.find(t => String(t.match_id) === String(matchId));
     }
@@ -2545,7 +2545,9 @@ await client
 .update({
 avatar: avatarKey
 })
-.eq("id", String(telegramUser));
+.eq("user_id", String(telegramUser));
+
+alert("gespeichert");
 
 loadUser();
 
