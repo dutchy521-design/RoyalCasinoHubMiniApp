@@ -1251,30 +1251,86 @@ BONUS SICHERN
 <h2>👤Social Hub</h2>
 
 <div class="card">
-Telegram ID:
-<b id="userid">Lädt...</b>
+👤 Benutzer:
+<b id="username">Lädt...</b>
+</div>
+
+
+<div class="card">
+
+<h3 id="leveltitle">
+⭐ Level 1
+</h3>
+
+<img
+id="rankimg"
+style="
+width:100%;
+border-radius:14px;
+margin-top:10px;
+">
+
+<div
+id="rankname"
+style="
+margin-top:12px;
+font-weight:900;
+font-size:20px;
+text-align:center;
+color:#ffd700;
+">
+</div>
+
 </div>
 
 <div class="card">
-App Mode:
-<b id="mode">...</b>
+
+<h3>👥 Freunde einladen</h3>
+
+<div style="
+opacity:.85;
+line-height:1.5;
+margin-bottom:15px;
+">
+
+Lade deine Freunde ein und sammle XP.
+
+Je mehr aktive Einladungen du hast,
+desto schneller steigst du im Level auf
+und sicherst dir einen Platz im Leaderboard.
+
+</div>
+
+<input
+id="reflink"
+readonly
+style="
+width:100%;
+padding:14px;
+border-radius:14px;
+border:none;
+background:rgba(255,255,255,0.08);
+color:white;
+font-weight:700;
+box-sizing:border-box;
+">
+
+<button onclick="copyLink()">
+📋 Link kopieren
+</button>
+
 </div>
 
 <div class="card">
-<h3>🏅 Dein Rang</h3>
-<img id="rankimg" style="width:100%;border-radius:14px;margin-top:10px;">
-<div id="rankname" style="margin-top:10px;font-weight:bold;"></div>
-</div>
+<h3>👥 Deine Einladungen</h3>
 
-<div class="card">
-<h3>🎯 Dein Invite Link</h3>
-<input id="reflink" readonly style="width:100%;padding:10px;border-radius:8px;border:none;">
-<button onclick="copyLink()">Copy Link</button>
+<div style="
+font-size:18px;
+font-weight:700;
+">
+Anzahl:
+<b id="invitecount">0</b>
 </div>
-
-<div class="card">
-<h3>👥 Invites</h3>
-<div>Count: <b id="invitecount">0</b></div>
 <div id="invitelist" style="margin-top:10px;opacity:0.8;"></div>
 </div>
 
@@ -1326,10 +1382,7 @@ const tg = window.Telegram?.WebApp;
 if(tg){
 tg.ready();
 tg.expand();
-document.getElementById("mode").innerText = "Telegram WebApp";
-}else{
-document.getElementById("mode").innerText = "Browser Mode";
-}
+
 
 /* USER */
 let telegramUser = null;
@@ -1400,9 +1453,12 @@ return loadUser();
 }
 
 const user = data[0];
-
+document.getElementById("username").innerText =
+user.first_name || "Unbekannt";
 const xp = user.xp || 0;
 const level = user.level || 1;
+document.getElementById("leveltitle").innerText =
+`⭐ Level ${level}`;
 
 document.getElementById("xp").innerText = xp;
 document.getElementById("level").innerText = level;
