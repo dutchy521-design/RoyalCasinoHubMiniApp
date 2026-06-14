@@ -2135,7 +2135,7 @@ window.loadWmMatches = async function(){
     const { data } = await client
       .from("wm_matches")
       .select("*")
-     
+      .gt("start_time", new Date().toISOString())
       .order("start_time", { ascending: true });
 
     if(!data || data.length === 0){
