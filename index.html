@@ -1250,9 +1250,32 @@ BONUS SICHERN
 <div id="profile" class="page">
 <h2>👤Social Hub</h2>
 
-<div class="card">
-👤 Benutzer:
+<div class="card" style="text-align:center;">
+
+<img
+id="avatarimg"
+src="https://i.imgur.com/OVNr24y.jpeg"
+style="
+width:110px;
+height:110px;
+border-radius:50%;
+object-fit:cover;
+border:3px solid #ffd700;
+box-shadow:0 0 20px rgba(255,215,0,0.35);
+margin-bottom:12px;
+">
+
+<div style="
+font-size:22px;
+font-weight:900;
+">
 <b id="username">Lädt...</b>
+</div>
+
+<button onclick="openAvatarPicker()">
+🎭 Avatar auswählen
+</button>
+
 </div>
 
 
@@ -1416,6 +1439,19 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+const avatarUrls = {
+
+avatar1:"https://i.imgur.com/OVNr24y.jpeg",
+avatar2:"https://i.imgur.com/HDpf0Hd.jpeg",
+avatar3:"https://i.imgur.com/PlLyR7g.jpeg",
+avatar4:"https://i.imgur.com/ECLtpUT.jpeg",
+
+avatar5:"https://i.imgur.com/PLGaEGF.jpeg",
+avatar6:"https://i.imgur.com/NJDPVhe.jpeg",
+avatar7:"https://i.imgur.com/wJGn4wY.jpeg",
+avatar8:"https://i.imgur.com/DzU6EZ4.jpeg"
+
+};
 async function loadUser(){
 
 try{
@@ -1452,6 +1488,11 @@ return loadUser();
 }
 
 const user = data[0];
+const avatar =
+user.avatar || "avatar1";
+
+document.getElementById("avatarimg").src =
+avatarUrls[avatar];
 document.getElementById("username").innerText =
 user.first_name || "Unbekannt";
 const xp = user.xp || 0;
@@ -2473,6 +2514,42 @@ async function loadPastMatches(){
     container.innerHTML = "Fehler beim Laden";
   }
 }
+}
+async function openAvatarPicker(){
+
+let choice = prompt(
+`Avatar wählen:
+
+1 = Avatar 1
+2 = Avatar 2
+3 = Avatar 3
+4 = Avatar 4
+
+5 = Avatar 5
+6 = Avatar 6
+7 = Avatar 7
+8 = Avatar 8`
+);
+
+if(!choice) return;
+
+const avatarKey =
+"avatar" + choice;
+
+if(!avatarUrls[avatarKey]){
+alert("Ungültige Auswahl");
+return;
+}
+
+await client
+.from("users")
+.update({
+avatar: avatarKey
+})
+.eq("id", String(telegramUser));
+
+loadUser();
+
 }
 </script>
 
