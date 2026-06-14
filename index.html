@@ -1275,7 +1275,14 @@ font-weight:900;
 <button onclick="openAvatarPicker()">
 🎭 Avatar auswählen
 </button>
+<div id="avatarPicker" style="
+display:none;
+margin-top:15px;
+">
 
+HIER KOMMEN SPÄTER DIE 8 AVATARE REIN
+
+</div>
 </div>
 
 
@@ -1780,30 +1787,17 @@ document.execCommand("copy");
 alert("Link kopiert!");
 }
 
-window.openAvatarPicker = async function(){
-let choice = prompt(
-`Avatar wählen:
+window.openAvatarPicker = function(){
 
-1 = Avatar 1
-2 = Avatar 2
-3 = Avatar 3
-4 = Avatar 4
+const picker =
+document.getElementById("avatarPicker");
 
-5 = Avatar 5
-6 = Avatar 6
-7 = Avatar 7
-8 = Avatar 8`
-);
+picker.style.display =
+picker.style.display === "block"
+? "none"
+: "block";
 
-if(!choice) return;
-
-const avatarKey =
-"avatar" + choice;
-
-if(!avatarUrls[avatarKey]){
-alert("Ungültige Auswahl");
-return;
-}
+};
 
 await client
 .from("users")
