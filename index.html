@@ -1641,7 +1641,7 @@ loadDaily();
 },1000);
 }
 
-async function claimDaily(){
+window.claimDaily = async function(){
   const btn = document.getElementById("dailyBtn");
   btn.disabled = true;
 
@@ -2242,7 +2242,7 @@ document.getElementById("mySpecialTips").innerHTML = `
 
 }
 
-async function saveTip(matchId){
+window.saveTip = async function(matchId){
 
 const home = document.getElementById("home_" + matchId).value;
 const away = document.getElementById("away_" + matchId).value;
@@ -2412,7 +2412,7 @@ window.loadWmLeaderboard = async function(){
   }
 }
 
-async function saveSpecialTips(){
+window.saveSpecialTips = async function(){
 
 const result = document.getElementById("specialTipsResult");
 
