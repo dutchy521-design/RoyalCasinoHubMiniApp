@@ -1286,7 +1286,10 @@ grid-template-columns:repeat(4,1fr);
 gap:10px;
 ">
 
-<img src="https://i.imgur.com/OVNr24y.jpeg" style="
+<img
+src="https://i.imgur.com/OVNr24y.jpeg"
+onclick="selectAvatar('avatar1')"
+style="
 width:70px;
 height:70px;
 border-radius:50%;
@@ -1867,7 +1870,20 @@ picker.style.display === "block"
 
 };
 
+window.selectAvatar = async function(avatarKey){
 
+await client
+.from("users")
+.update({
+avatar: avatarKey
+})
+.eq("id", String(telegramUser));
+
+loadUser();
+
+document.getElementById("avatarPicker").style.display = "none";
+
+};
 const slotSymbols = [
 "👑",
 "💎",
