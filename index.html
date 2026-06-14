@@ -1395,7 +1395,7 @@ document.querySelector(`[onclick="show('${p}')"]`)?.classList.add('active');
 if(p === "wm"){
   loadWmMatches();
   loadWmLeaderboard();
-  loadSpecialTips();
+  
 }
 }
 
@@ -1810,7 +1810,7 @@ await client
 .update({
 avatar: avatarKey
 })
-.eq("user_id", String(telegramUser));
+.eq("id", String(telegramUser));
 
 alert("gespeichert");
 
