@@ -1773,6 +1773,46 @@ loadDaily();
 
 /* COPY */
 function copyLink(){
+
+async function openAvatarPicker(){
+
+let choice = prompt(
+`Avatar wählen:
+
+1 = Avatar 1
+2 = Avatar 2
+3 = Avatar 3
+4 = Avatar 4
+
+5 = Avatar 5
+6 = Avatar 6
+7 = Avatar 7
+8 = Avatar 8`
+);
+
+if(!choice) return;
+
+const avatarKey =
+"avatar" + choice;
+
+if(!avatarUrls[avatarKey]){
+alert("Ungültige Auswahl");
+return;
+}
+
+await client
+.from("users")
+.update({
+avatar: avatarKey
+})
+.eq("user_id", String(telegramUser));
+
+alert("gespeichert");
+
+loadUser();
+
+}	
+
 const el = document.getElementById("reflink");
 el.select();
 document.execCommand("copy");
@@ -2514,44 +2554,7 @@ async function loadPastMatches(){
     container.innerHTML = "Fehler beim Laden";
   }
 }
-async function openAvatarPicker(){
-
-let choice = prompt(
-`Avatar wählen:
-
-1 = Avatar 1
-2 = Avatar 2
-3 = Avatar 3
-4 = Avatar 4
-
-5 = Avatar 5
-6 = Avatar 6
-7 = Avatar 7
-8 = Avatar 8`
-);
-
-if(!choice) return;
-
-const avatarKey =
-"avatar" + choice;
-
-if(!avatarUrls[avatarKey]){
-alert("Ungültige Auswahl");
-return;
-}
-
-await client
-.from("users")
-.update({
-avatar: avatarKey
-})
-.eq("user_id", String(telegramUser));
-
-alert("gespeichert");
-
-loadUser();
-
-}	
+	
 }
 </script>
 
