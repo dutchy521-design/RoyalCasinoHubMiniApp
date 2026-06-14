@@ -1799,19 +1799,6 @@ picker.style.display === "block"
 
 };
 
-await client
-.from("users")
-.update({
-avatar: avatarKey
-})
-.eq("id", String(telegramUser));
-
-alert("gespeichert");
-
-loadUser();
-
-};	
-
 
 const slotSymbols = [
 "👑",
