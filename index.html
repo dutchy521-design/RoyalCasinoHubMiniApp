@@ -2222,7 +2222,7 @@ font-weight:700;
   }
 }
 
-async function loadSpecialTips(){
+window.loadSpecialTips = async function(){
 
 const { data } = await client
 .from("wm_special_tips")
